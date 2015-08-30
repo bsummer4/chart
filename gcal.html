@@ -1,0 +1,119 @@
+<html>
+  <head>
+    <script type="text/javascript">
+      var CLIENT_ID = '513026491729-icj865qne4cbe8d65m70c7kvq084ahus.apps.googleusercontent.com';
+
+      var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+
+      // checkAuth ∷ IO a
+      function checkAuth() {
+        gapi.auth.authorize({ client_id: CLIENT_ID
+                            , scope: SCOPES
+                            , immediate: true
+                            }, handleAuthResult)}
+
+      // handleAuthResult ∷ Authorization → IO ()
+      function handleAuthResult(authResult) {
+          var authorizeDiv = document.getElementById('authorize-div');
+          if (authResult && !authResult.error) {
+              authorizeDiv.style.display = 'none';
+              loadCalendarApi();
+          } else {
+              authorizeDiv.style.display = 'inline'; }
+      }
+
+      // handleAuthClick ∷ Event → IO Bool
+      function handleAuthClick(event) {
+          gapi.auth.authorize(
+              {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
+              handleAuthResult);
+          return false; }
+
+      // loadCalendarApi ∷ IO ()
+      function loadCalendarApi() {
+        gapi.client.load('calendar', 'v3', listUpcomingEvents); }
+
+      /**
+       * Print the summary and start datetime/date of the next ten events in
+       * the authorized user's calendar. If no events are found an
+       * appropriate message is printed.
+       */
+      function listUpcomingEvents() {
+        var request = gapi.client.calendar.events.list({
+          calendarId: 'primary',
+          timeMin: new Date(2015,7,1).toISOString(), // Aug 1st
+          timeMax: new Date(2015,8,1).toISOString(), // Sep 1st
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 2500,
+          fields: 'description,items(start,end,colorId,description,summary),kind,summary',
+          orderBy: 'startTime'
+
+        });
+
+        request.execute(function(resp) {
+          var events = resp.items;
+          appendRow(['', '', '', 'Upcoming events:']);
+
+          if (events.length > 0) {
+            for (i = 0; i < events.length; i++) {
+              var event = events[i];
+              console.log(event);
+              var start = new Date(event.start.dateTime || event.end.date);
+              var end = new Date(event.end.dateTime || event.end.date);
+
+              var day = start.getDate()
+              var hours = start.getHours()
+              var minutes = start.getMinutes()
+              var endHours = end.getHours()
+              var endMinutes = end.getMinutes()
+              var color = event.colorId || "";
+              fmtTime = function (h,m) { return (h + ":" + m) }
+              appendRow([ day
+                        , fmtTime(hours,minutes) + " - " + fmtTime(endHours,endMinutes)
+                        , color
+                        , event.summary
+                        , event.description || ""])
+            }
+          } else {
+            appendRow(['No upcoming events found.']);
+          }
+
+        });
+      }
+
+      /**
+       * Append a pre element to the body containing the given message
+       * as its text node.
+       *
+       * @param {string} message Text to be placed in pre element.
+       */
+      function appendRow(cols) {
+          var tbl = document.getElementById('output');
+          var row = document.createElement("tr");
+          cols.forEach(function (colText) {
+              var cell        = document.createElement("td");
+              var pre         = document.createElement("pre");
+              var textContent = document.createTextNode(colText + '\n');
+              pre.appendChild(textContent);
+              cell.appendChild(pre);
+              row.appendChild(cell);
+          })
+          tbl.appendChild(row)
+      }
+
+    </script>
+
+    <script src="https://apis.google.com/js/client.js?onload=checkAuth">
+    </script>
+  </head>
+  <body>
+    <div id="authorize-div" style="display: none">
+      <span>Authorize access to Google Calendar API</span>
+      <button id="authorize-button" onclick="handleAuthClick(event)">
+        Authorize
+      </button>
+    </div>
+    <table cellpadding=1 cellspacing=1 border=1 id="output"></table>
+  </body>
+</html>
