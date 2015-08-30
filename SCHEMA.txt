@@ -1,9 +1,0 @@
-MealPoint  : Under500    | Under750 | SingleSitting | Teeth  | NoFudge
-CantoPoint : Listen1     | Listen2  | Listen3       | Anki   | PracticeWJess
-FitPoint   : BikeCommute | Cardio   | Lift          | Gym    | Stretch
-OrgPoint   : Clean1      | Clean2   | Chore1        | Chore2 | InboxZero
-BlockPoint : Block1      | Block2   | Block3        | Block4 | Block5
-
-Stat : WakeUp | GetUp | StartedWorking
-     | Weight | Waist
-     | Squat | Bench | Dead | Chin | Press | Purdy
