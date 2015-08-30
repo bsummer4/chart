@@ -109,7 +109,7 @@ rowLabels ∷ String → Diagram B
 rowLabels month = vcat (square 1 # lwG 0 : sheetLabel month # lwG (1/40) : rowNames)
   where rowNames = lwG (1/40) . rowLabel <$>
           [ "canto", "meals", "fit", "blocks", "org", "", "wakeTime", "getup"
-          , "caltrain", "weight", "waist", "squat", "bench", "dead", "chin"
+          , "get-started", "weight", "waist", "squat", "bench", "dead", "chin"
           , "press", "purdy" ]
 
 dispJulyDay ∷ Int → JulyDay → Diagram B
@@ -167,9 +167,9 @@ dispAugustDay dayNum day = case day of
                        , dispPoint (score <$> auBlocks)     # lwG (1/80)
                        , dispPoint (score <$> auOrg)        # lwG (1/80)
                        , square 1                           # lwG 0
-                       , dispEntry auWakeTime               # lwG (1/80)
-                       , dispEntry auGetup                  # lwG (1/80)
-                       , dispEntry auCaltrain               # lwG (1/80)
+                       , dispEntry auWakeUp               # lwG (1/80)
+                       , dispEntry auGetUp                  # lwG (1/80)
+                       , dispEntry auGetStarted             # lwG (1/80)
                        , dispEntry auWeight                 # lwG (1/80)
                        , dispEntry auWaist                  # lwG (1/80)
                        , dispEntry auSquat                  # lwG (1/80)
@@ -650,7 +650,7 @@ data AugustDay = AugustDay {
   , auFit    ∷ Points FitPoint
   , auBlocks ∷ Points BlockPoint
   , auOrg    ∷ Points OrgPoint
-  , auWakeTime, auGetup, auCaltrain, auWeight, auWaist, auSquat, auBench
+  , auWakeUp, auGetUp, auGetStarted, auWeight, auWaist, auSquat, auBench
   , auDead, auChin, auPress, auPurdy ∷ Entry
   , stats ∷ Stats
   } deriving (Eq,Ord)
@@ -662,9 +662,9 @@ augustBlank = AugustDay {
   , auFit      = n
   , auBlocks   = n
   , auOrg      = n
-  , auWakeTime = idk
-  , auGetup    = idk
-  , auCaltrain = idk
+  , auWakeUp = idk
+  , auGetUp    = idk
+  , auGetStarted = idk
   , auWeight   = idk
   , auWaist    = idk
   , auSquat    = idk
@@ -686,15 +686,15 @@ august = zip [1..31] $ (++ repeat augustBlank) $
               , auFit      = j[Stretch,Cardio,Lift] -- Walking,chins
               , auBlocks   = j[Block1,Block2]       -- Pottery, Chart
               , auOrg      = j[Clean1,Clean2,Chore1,Chore2]
-              , auWakeTime = bad 6.0
-              , auGetup    = good 20
-              , auCaltrain = NA
-              , auWeight   = good 216
-              , auWaist    = good 37.0
+              , auWakeUp = bad 6.0
+              , auGetUp    = good 6.3
+              , auGetStarted = NA
+              , auWeight   = meh 216
+              , auWaist    = meh 37.0
               , auSquat    = NA
               , auBench    = NA
               , auDead     = NA
-              , auChin     = good 216
+              , auChin     = meh 216
               , auPress    = NA
               , auPurdy    = NA
               , stats      = []
@@ -708,14 +708,14 @@ august = zip [1..31] $ (++ repeat augustBlank) $
               , auFit      = j[BikeCommute,Cardio,Stretch]
               , auBlocks   = j[]
               , auOrg      = j[Clean1,Clean2,Chore1,Chore2,InboxZero]
-              , auWakeTime = meh 5.6
-              , auGetup    = good 15
-              , auCaltrain = NA
-              , auWeight   = good 217
-              , auWaist    = good 37.1
-              , auSquat    = failed
+              , auWakeUp = meh 5.6
+              , auGetUp    = good 5.8
+              , auGetStarted = NA
+              , auWeight   = meh 217
+              , auWaist    = meh 37.1
+              , auSquat    = NA
               , auBench    = NA
-              , auDead     = failed
+              , auDead     = NA
               , auChin     = NA
               , auPress    = NA
               , auPurdy    = NA
@@ -732,12 +732,12 @@ august = zip [1..31] $ (++ repeat augustBlank) $
               , auBlocks   = j[Block1,Block2,Block3,Block4]
               , auOrg      = j[Chore1,Chore2]
 
-              , auWakeTime = good 5.3 -- 5:20
-              , auGetup    = bad 45   -- 6:05
-              , auCaltrain = bad 130  -- 8:15
-              , auWeight   = good 218
-              , auWaist    = good 37.2
-              , auSquat    = good 192
+              , auWakeUp = good 5.3
+              , auGetUp    = bad 6.1
+              , auGetStarted = bad 8.25
+              , auWeight   = meh 218
+              , auWaist    = meh 37.2
+              , auSquat    = meh 192
               , auBench    = NA
               , auDead     = NA
               , auChin     = NA
@@ -756,17 +756,17 @@ august = zip [1..31] $ (++ repeat augustBlank) $
               , auBlocks   = j[Block1,Block2,Block3,Block4,Block5] -- Work, Backups.
               , auOrg      = j[Chore1,Chore2] -- Backups, canceled services.
 
-              , auWakeTime = good 5.3 -- 5:20
-              , auGetup    = bad 25   -- 5:45
-              , auCaltrain = bad 60   -- 6:45
-              , auWeight   = good 217
-              , auWaist    = good 37.3
+              , auWakeUp = good 5.3 -- 5:20
+              , auGetUp    = bad 5.75
+              , auGetStarted = bad 6.75
+              , auWeight   = meh 217
+              , auWaist    = meh 37.3
               , auSquat    = NA
               , auBench    = NA
               , auDead     = NA
-              , auChin     = failed
+              , auChin     = NA
               , auPress    = NA
-              , auPurdy    = failed
+              , auPurdy    = NA
               , stats      = []
               }
 
@@ -781,40 +781,39 @@ august = zip [1..31] $ (++ repeat augustBlank) $
               , auBlocks   = j[Block1,Block2,Block3,Block4,Block5] -- So much work.
               , auOrg      = j[]
 
-              , auWakeTime = meh 6.3 -- 6:20
-              , auGetup    = bad 35   -- 6:55
-              , auCaltrain = NA
-              , auWeight   = good 217
-              , auWaist    = good 37.3
+              , auWakeUp = meh 6.3 -- 6:20
+              , auGetUp    = bad 6.9
+              , auGetStarted = NA
+              , auWeight   = meh 217
+              , auWaist    = meh 37.3
               , auSquat    = NA
               , auBench    = NA
               , auDead     = NA
-              , auChin     = failed
+              , auChin     = NA
               , auPress    = NA
-              , auPurdy    = failed
-              , stats      = [ (WakeTime,meh 6.3),(GetUpTimer,bad 35),(Weight,good 217),(Waist,good 37.3)
-                             , (Chin,failed),(Purdy,failed)
+              , auPurdy    = NA
+              , stats      = [ (WakeUp,meh 6.3),(GetUpTimer,bad 35),(Weight,good 217),(Waist,good 37.3)
+                             , (Chin,NA),(Purdy,NA)
                              ]
               }
 
   -- Thursday, Aug 6
   , AugustDay { auCanto    = j[PracticeWJess,Anki]
               , auMeals    = Four
-                  (j[Under750,Under500,SingleSitting,NoFudge]) -- Soylent
-                  (j[Under750,Under500,SingleSitting,NoFudge]) -- Soylent
-                  (j[Under750,Under500,SingleSitting])         -- Beer @ Wagon (under 500)
-                  (j[Under750,Under500,Teeth])                 -- Food w/ J    (over 500)
-              , auFit      = j[Gym,Stretch,Lift]
+                  (j[Under750,Under500,SingleSitting,NoFudge])       -- Soylent
+                  (j[SingleSitting,NoFudge])                         -- Lunch with Tim.
+                  (j[Under750,Under500,SingleSitting,Teeth])         -- Starbucks, Pretzel
+                  (j[Under750,Under500,SingleSitting,NoFudge,Teeth]) -- Soylent
+              , auFit      = j[Gym,Stretch,Lift,Cardio]
               , auBlocks   = j[Block1,Block2,Block3,Block4,Block5] -- work*4 + wagon
-              , auOrg      = j[Clean1,Clean2,InboxZero,Chore1,Chore2]
-
-              , auWakeTime = good 5    -- 5:00
-              , auGetup    = bad 40    -- 5:40
-              , auCaltrain = bad 50    -- 6:30
-              , auWeight   = good 216
-              , auWaist    = good 37.1
-              , auSquat    = good 204.2
-              , auBench    = good 52.5
+              , auOrg      = j[InboxZero]
+              , auWakeUp = good 5
+              , auGetUp    = bad 5.6
+              , auGetStarted = bad 6.5
+              , auWeight   = meh 216
+              , auWaist    = meh 37.1
+              , auSquat    = meh 198.3
+              , auBench    = meh 110
               , auDead     = NA
               , auChin     = NA
               , auPress    = NA
@@ -823,28 +822,79 @@ august = zip [1..31] $ (++ repeat augustBlank) $
               }
 
   -- Friday, Aug 7
-  , AugustDay { auCanto    = j[Listen1,Anki,PracticeWJess]
+  , AugustDay { auCanto    = j[Anki,PracticeWJess,Listen1]
               , auMeals    = Four
-                  (j[Under750,Under500,SingleSitting,NoFudge]) -- Soylent
-                  (j[Under750,Under500,SingleSitting,NoFudge]) -- Soylent
-                  (j[Under750,Under500,SingleSitting,Teeth])    -- Dinner w/ Jessica
-                  (j[Under750,Under500,SingleSitting,Teeth])    -- Combined with ^
-              , auFit      = j[Gym,Stretch,Lift]
+                  (j[Under750,SingleSitting,NoFudge,Teeth])          -- 2*mochi+½*cookie = ~700
+                  (j[Under750,Under500,SingleSitting,NoFudge,Teeth]) -- Soylent
+                  (j[Under750,Under500,SingleSitting,Teeth])         -- Dinner w/ Jessica
+                  (j[Under750,Under500,SingleSitting,Teeth])         -- Combined with ^
+              , auFit      = j[BikeCommute,Cardio,Stretch]
               , auBlocks   = j[Block1,Block2,Block3,Block4] -- Work*4
-              , auOrg      = j[Chore1,Chore2,InboxZero,Clean1,Clean2]
+              , auOrg      = j[InboxZero,Chore1]
 
-              , auWakeTime = good 5
-              , auGetup    = meh 30
-              , auCaltrain = meh 30
-              , auWeight   = idk
-              , auWaist    = idk
+              , auWakeUp = bad 7.5
+              , auGetUp    = bad 8.1
+              , auGetStarted = bad 9.5
+              , auWeight   = meh 214
+              , auWaist    = meh 37.0
               , auSquat    = NA
               , auBench    = NA
-              , auDead     = Idk
-              , auChin     = Idk
-              , auPress    = Idk
+              , auDead     = NA
+              , auChin     = NA
+              , auPress    = NA
               , auPurdy    = NA
               , stats      = []
+              }
+
+  -- Saturday, Aug 8
+  , AugustDay { auCanto    = j[Listen1,Listen2,Listen3,PracticeWJess]
+              , auMeals    = Four
+                  (j[Under750,Under500,SingleSitting,      NoFudge])
+                  (j[Under750,         SingleSitting,Teeth,NoFudge])
+                  (j[Under750,Under500,SingleSitting,Teeth        ])
+                  (j[Under750,Under500,SingleSitting,Teeth        ])
+              , auFit      = j[Cardio]
+              , auBlocks   = j[]
+              , auOrg      = j[]
+
+              , auWakeUp     = good 4.8
+              , auGetUp      = good 5.5
+              , auGetStarted = good 6
+              , auWeight     = meh 214
+              , auWaist      = meh 36.7
+              , auSquat      = NA
+              , auBench      = NA
+              , auDead       = NA
+              , auChin       = NA
+              , auPress      = NA
+              , auPurdy      = NA
+              , stats        = []
+              }
+
+  -- Sunday, August 9
+  , AugustDay { auCanto    = j[]
+              , auMeals    = Four
+                  (j[Under750,Under500,SingleSitting,Teeth,NoFudge])
+                  (j[Under750,Under500,SingleSitting,Teeth,NoFudge])
+                  (n)
+                  (n)
+
+              , auFit      = j[]
+              , auBlocks   = j[]
+              , auOrg      = j[]
+
+              , auWakeUp     = good 5
+              , auGetUp      = bad  8.3
+              , auGetStarted = bad  9
+              , auWeight     = meh 213
+              , auWaist      = meh 37.0
+              , auSquat      = NA
+              , auBench      = NA
+              , auDead       = NA
+              , auChin       = NA
+              , auPress      = NA
+              , auPurdy      = NA
+              , stats        = []
               }
   ]
 
@@ -856,8 +906,7 @@ data BlockPoint = Block1 | Block2 | Block3 | Block4 | Block5            deriving
 
 type Stats = M.Map Stat Entry
 
-data Stat = WakeTime | GetUpTimer | CalTrainTimer
+data Stat = WakeUp | GetUpTimer | CalTrainTimer
           | Weight | Waist
           | Squat  | Bench | Dead | Chin | Press | Purdy
           deriving (Eq,Ord)
-
